@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ Cancha Fútbol 5</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --v1:#1B5E20;--v2:#2E7D32;--v3:#43A047;--v5:#E8F5E9;--v4:#C8E6C9;
+  --a2:#1565C0;--a4:#E3F2FD;
+  --r1:#B71C1C;--r2:#FFCDD2;
+  --n1:#E65100;--n2:#FFE0B2;
+  --m1:#4E342E;--m2:#EFEBE9;
+  --am:#F57F17;--am2:#FFF9C4;
+  --gr:#37474F;--g2:#90A4AE;--g3:#ECEFF1;--g4:#CFD8DC;
+  --bl:#FFFFFF;--fd:#EEF2EE;
+  --fn:'Nunito',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fn);background:var(--fd);color:var(--gr);min-height:100vh;-webkit-tap-highlight-color:transparent}
+
+/* ══ PANTALLAS RAÍZ ══ */
+.screen{display:none;min-height:100vh}
+.screen.activa{display:block}
+#s-inicio{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,var(--v1),#0a2e0d);padding:24px 20px;min-height:100vh}
+#s-pin{display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,var(--v1),#0a2e0d);padding:24px 20px;min-height:100vh}
+
+/* ══ INICIO ══ */
+.ini-logo{font-size:52px;text-align:center;margin-bottom:6px}
+.ini-tit{font-size:22px;font-weight:900;color:var(--bl);text-align:center;margin-bottom:3px}
+.ini-fecha{font-size:12px;color:#81C784;font-weight:700;text-align:center;margin-bottom:32px}
+.ini-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:320px}
+.ini-btn{padding:26px 12px;border:2px solid rgba(255,255,255,.2);border-radius:18px;
+  background:rgba(255,255,255,.09);font-family:var(--fn);color:var(--bl);cursor:pointer;text-align:center;transition:all .14s}
+.ini-btn:active{transform:scale(.95);background:rgba(255,255,255,.18)}
+.ini-btn .ib-ico{font-size:38px;margin-bottom:8px}
+.ini-btn .ib-nom{font-size:18px;font-weight:900}
+.ini-btn .ib-sub{font-size:11px;font-weight:700;color:#A5D6A7;margin-top:3px}
+.ini-btn.res{border-color:rgba(255,241,118,.4);background:rgba(255,241,118,.07)}
+.ini-btn.res .ib-sub{color:#FFF176}
+
+/* ══ PIN ══ */
+.pin-tit{font-size:20px;font-weight:900;color:var(--bl);margin-bottom:4px;text-align:center}
+.pin-sub{font-size:12px;color:#81C784;font-weight:700;margin-bottom:26px;text-align:center}
+.pin-dots{display:flex;gap:14px;margin-bottom:26px}
+.pin-dot{width:18px;height:18px;border-radius:50%;border:3px solid rgba(255,255,255,.3);background:transparent;transition:all .13s}
+.pin-dot.on{background:var(--bl);border-color:var(--bl)}
+.pin-dot.err{background:var(--r1);border-color:var(--r1)}
+.pin-teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:260px}
+.pk{padding:15px 8px;border:2px solid rgba(255,255,255,.15);border-radius:12px;
+  background:rgba(255,255,255,.1);font-family:var(--fn);font-size:20px;font-weight:900;
+  color:var(--bl);cursor:pointer;text-align:center;transition:all .11s}
+.pk:active{background:rgba(255,255,255,.28);transform:scale(.91)}
+.pk.bk{font-size:15px;background:rgba(255,255,255,.04)}
+.pk.vk{background:transparent;border:none;cursor:default}
+.pin-msg{font-size:13px;font-weight:800;color:#EF9A9A;margin-top:14px;min-height:18px;text-align:center}
+.pin-volver{margin-top:16px;background:transparent;border:none;color:#A5D6A7;
+  font-family:var(--fn);font-size:13px;font-weight:800;cursor:pointer;text-decoration:underline}
+
+/* ══ APP SHELL ══ */
+#s-app{display:none;flex-direction:column;min-height:100vh}
+/* header */
+.hdr{background:linear-gradient(135deg,var(--v1),var(--v2));padding:9px 14px;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hdr-l{display:flex;flex-direction:column}
+.hdr-tit{font-size:14px;font-weight:900;color:var(--bl);display:flex;align-items:center;gap:7px}
+.hdr-badge{font-size:10px;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:10px;font-weight:800}
+.hdr-fecha{font-size:10px;color:#A5D6A7;font-weight:700;margin-top:1px}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.hdr-hora{font-size:18px;font-weight:900;color:#FFF176;letter-spacing:1px}
+.hdr-sal{background:rgba(255,255,255,.15);border:none;border-radius:8px;color:var(--bl);
+  font-family:var(--fn);font-size:11px;font-weight:800;padding:5px 11px;cursor:pointer}
+/* sync strip (solo resumen) */
+.sync-strip{background:rgba(0,0,0,.22);padding:4px 14px;display:none;align-items:center;
+  gap:7px;font-size:11px;font-weight:800;color:#A5D6A7;flex-shrink:0}
+.sync-strip.pend{color:#FFF176}.sync-strip.noinet{color:#EF9A9A}
+.sdot{width:7px;height:7px;border-radius:50%;background:#81C784;flex-shrink:0}
+.sync-strip.pend .sdot{background:#FDD835;animation:bl 1s infinite}
+.sync-strip.noinet .sdot{background:#EF9A9A}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.2}}
+/* tabs */
+.tabs{background:var(--v1);display:flex;border-bottom:3px solid var(--v2);flex-shrink:0}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;
+  border:none;background:transparent;color:#81C784;font-family:var(--fn);font-size:10px;
+  font-weight:800;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .14s}
+.tab .ti{font-size:20px}
+.tab.activa{color:var(--bl);border-bottom-color:#FFF176;background:rgba(255,255,255,.08)}
+.tab:active{opacity:.7}
+/* contenido */
+.contenido{flex:1;overflow-y:auto;padding:12px 12px 20px;max-width:680px;width:100%;margin:0 auto}
+
+/* ══ PANTALLAS DE CONTENIDO ══ */
+.vista{display:none}
+.vista.activa{display:block}
+
+/* ══ COMPONENTES ══ */
+.card{background:var(--bl);border-radius:14px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,.1);margin-bottom:12px}
+.ctit{font-size:13px;font-weight:900;color:var(--v2);margin-bottom:12px;
+  border-bottom:2px solid var(--v5);padding-bottom:8px;display:flex;align-items:center;gap:6px}
+
+.lbl{display:block;font-size:10px;font-weight:900;color:var(--g2);text-transform:uppercase;
+  letter-spacing:.6px;margin-bottom:6px;margin-top:14px}
+.lbl:first-child{margin-top:0}
+
+input[type=number],input[type=date],input[type=text],input[type=password],select,textarea{
+  width:100%;padding:11px 12px;font-family:var(--fn);font-size:16px;font-weight:800;
+  border:2px solid var(--g4);border-radius:10px;background:var(--bl);color:var(--gr);
+  outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none}
+input[type=number]{text-align:center}
+input:focus,select:focus,textarea:focus{border-color:var(--v3)}
+input[type=number]::-webkit-inner-spin-button{opacity:1;transform:scale(1.3)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath fill='%2337474F' d='M6 9l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:36px}
+textarea{font-size:14px;resize:vertical}
+
+.ops{display:grid;gap:8px}
+.ops.c2{grid-template-columns:1fr 1fr}
+.ops.c3{grid-template-columns:1fr 1fr 1fr}
+.ops.wrap{display:flex;flex-wrap:wrap;gap:7px}
+@media(max-width:360px){.ops.c3{grid-template-columns:1fr 1fr}}
+
+.bo{padding:11px 7px;border:2px solid var(--g4);border-radius:11px;background:var(--bl);
+  font-family:var(--fn);font-size:13px;font-weight:800;color:var(--gr);cursor:pointer;
+  text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;
+  line-height:1.2;transition:all .13s;user-select:none}
+.bo .i{font-size:24px}
+.bo.hb{padding:10px 5px;font-size:15px;font-weight:900}
+.bo.hb .i{font-size:18px}
+.bo:active{transform:scale(.94)}
+.bo.sv{border-color:var(--v2);background:var(--v5);color:var(--v1)}
+.bo.sa{border-color:var(--a2);background:var(--a4);color:var(--a2)}
+.bo.sn{border-color:var(--n1);background:var(--n2);color:var(--n1)}
+.bo.sm{border-color:var(--m1);background:var(--m2);color:var(--m1)}
+
+.sec{display:none;margin-top:14px;padding-top:14px;border-top:2px dashed var(--g4)}
+.sec.on{display:block}
+
+/* carrito bebidas */
+.carrito{background:var(--v5);border-radius:10px;padding:10px 12px;margin-top:10px}
+.carrito-tit{font-size:10px;font-weight:900;color:var(--v2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.ci{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--v4)}
+.ci:last-child{border:none}
+.ci-nom{font-size:13px;font-weight:800}
+.ci-der{display:flex;align-items:center;gap:8px}
+.ci-mon{font-size:13px;font-weight:900;color:var(--v2)}
+.ci-q{border:none;background:var(--r2);color:var(--r1);border-radius:6px;padding:2px 7px;font-size:12px;font-weight:900;cursor:pointer;font-family:var(--fn)}
+
+/* pago mixto */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.pc>span{display:block;font-size:10px;font-weight:900;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.pc.efe input{border-color:#81C784;background:#F1FBF1}
+.pc.trf input{border-color:#64B5F6;background:#EFF8FF}
+
+/* total box */
+.tbox{background:linear-gradient(135deg,var(--v1),var(--v2));border-radius:12px;padding:14px 16px;
+  text-align:center;margin-top:14px;display:none}
+.tbox .tlbl{color:#A5D6A7;font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.tbox .tmonto{color:var(--bl);font-size:38px;font-weight:900;letter-spacing:-1px;margin:2px 0}
+.tbox .tdet{color:#FFF176;font-size:12px;font-weight:800}
+.tbox .tdesg{color:#A5D6A7;font-size:11px;margin-top:3px;font-weight:700}
+
+/* botón guardar */
+.bguard{width:100%;padding:15px;margin-top:12px;border:none;border-radius:12px;
+  font-family:var(--fn);font-size:16px;font-weight:900;cursor:pointer;transition:all .13s}
+.bguard.gv{background:linear-gradient(135deg,var(--v2),var(--v3));color:var(--bl);box-shadow:0 4px 14px rgba(46,125,50,.3)}
+.bguard.gm{background:linear-gradient(135deg,#5D4037,#795548);color:var(--bl)}
+.bguard.ga{background:linear-gradient(135deg,var(--a2),#1976D2);color:var(--bl)}
+.bguard.gg{background:var(--g3);color:var(--gr);font-size:13px;padding:10px}
+.bguard:active{transform:scale(.97);opacity:.9}
+
+/* KPIs */
+.kgrid{display:grid;gap:8px;margin-bottom:12px}
+.kgrid.k2{grid-template-columns:1fr 1fr}
+.kgrid.k3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:400px){.kgrid.k3{grid-template-columns:1fr 1fr}}
+.kpi{background:var(--bl);border-radius:14px;padding:12px 10px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.09)}
+.kpi .ki{font-size:22px;margin-bottom:3px}
+.kpi .kv{font-size:18px;font-weight:900;color:var(--v2)}
+.kpi .kl{font-size:9px;font-weight:900;color:var(--g2);margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+.kpi.ka .kv{color:var(--a2)}.kpi.kn .kv{color:var(--n1)}.kpi.km .kv{color:var(--m1)}.kpi.kam .kv{color:var(--am)}
+.kpi.big .kv{font-size:26px}
+
+/* item turno */
+.ti{background:var(--bl);border-radius:11px;padding:10px 12px;margin-bottom:7px;
+  box-shadow:0 1px 6px rgba(0,0,0,.07);display:flex;justify-content:space-between;
+  align-items:flex-start;border-left:4px solid var(--g4)}
+.ti.tc{border-left-color:var(--v2)}.ti.tcp{border-left-color:var(--v3)}
+.ti-l .cat{font-size:9px;font-weight:900;color:var(--g2);text-transform:uppercase;letter-spacing:.4px}
+.ti-l .det{font-size:13px;font-weight:800;color:var(--gr);margin-top:2px}
+.ti-l .sub{font-size:10px;color:var(--g2);margin-top:1px}
+.ti-r{text-align:right;min-width:70px}
+.ti-r .monto{font-size:16px;font-weight:900;color:var(--v2)}
+.ti-r .medio{font-size:10px;font-weight:800;color:var(--g2)}
+.pdot{width:6px;height:6px;border-radius:50%;background:#FDD835;display:inline-block;margin-left:4px;animation:bl 1s infinite}
+
+/* calendario */
+.mctrl{display:flex;align-items:center;justify-content:space-between;background:var(--bl);
+  border-radius:12px;padding:10px 14px;box-shadow:0 2px 10px rgba(0,0,0,.09);margin-bottom:10px}
+.mctrl .mxt{font-size:15px;font-weight:900;color:var(--v1)}
+.marrow{border:none;background:transparent;font-size:24px;cursor:pointer;color:var(--v2);padding:0 4px;line-height:1}
+.sem-blk{background:var(--bl);border-radius:11px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.sem-tit{font-size:10px;font-weight:900;color:var(--g2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
+.sem-dias{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.sd{border-radius:7px;padding:6px 2px;text-align:center;background:var(--g3)}
+.sd .sdn{font-size:11px;font-weight:900;color:var(--gr)}
+.sd .sdm{font-size:8px;font-weight:800;color:var(--g2);margin-top:1px;min-height:10px}
+.sd.tiene{background:var(--v5)}.sd.tiene .sdn{color:var(--v2)}.sd.tiene .sdm{color:var(--v3)}
+.sd.hd{background:var(--v2)}.sd.hd .sdn{color:var(--bl)}.sd.hd .sdm{color:#A5D6A7}
+.sd.fds{background:var(--am2)}
+
+/* stock */
+.sti{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border-radius:11px;margin-bottom:7px}
+.sti.ok{background:var(--v5);border-left:5px solid var(--v3)}
+.sti.rev{background:#FFFDE7;border-left:5px solid #FDD835}
+.sti.sin{background:var(--r2);border-left:5px solid var(--r1)}
+.sti .sp{font-size:15px;font-weight:800}.sti .se{font-size:11px;font-weight:700;margin-top:2px}
+.sti .sc{font-size:28px;font-weight:900}
+
+.fctrl{display:flex;align-items:center;gap:8px;background:var(--bl);border-radius:11px;
+  padding:10px 13px;box-shadow:0 2px 10px rgba(0,0,0,.09);margin-bottom:10px}
+.fctrl span{font-size:12px;font-weight:900;white-space:nowrap}
+.fctrl input{flex:1;margin:0;font-size:14px;padding:7px 10px}
+
+.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:380px){.cfg-grid{grid-template-columns:1fr}}
+
+.ph-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:9px;background:var(--g3);margin-bottom:5px}
+.ph-item .phm{font-size:12px;font-weight:800}.ph-item .phv{font-size:13px;font-weight:900;color:var(--v2)}
+
+.setup-box{background:#E8EAF6;border-radius:11px;padding:12px;margin-bottom:9px;border-left:4px solid #3F51B5}
+.setup-box h3{font-size:12px;font-weight:900;color:#1A237E;margin-bottom:6px}
+.setup-box p{font-size:11px;font-weight:700;color:var(--gr);line-height:1.6;margin-bottom:5px}
+.setup-box code{display:block;background:#C5CAE9;border-radius:7px;padding:8px 10px;font-family:monospace;font-size:10px;color:#1A237E;margin:5px 0;word-break:break-all;user-select:all;white-space:pre-wrap}
+.pnum{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;background:#3F51B5;color:#fff;border-radius:50%;font-size:11px;font-weight:900;margin-right:5px;flex-shrink:0}
+
+.vacio{text-align:center;padding:28px 16px;color:var(--g2)}
+.vacio .vi{font-size:40px;margin-bottom:7px}
+.vacio p{font-size:13px;font-weight:700}
+
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(14px);
+  background:var(--v2);color:var(--bl);padding:10px 22px;border-radius:50px;font-size:13px;
+  font-weight:800;box-shadow:0 6px 24px rgba(0,0,0,.2);opacity:0;pointer-events:none;
+  transition:all .28s;z-index:9999;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ══ INICIO ══ -->
+<div id="s-inicio">
+  <div class="ini-logo">⚽</div>
+  <div class="ini-tit">Fútbol 5</div>
+  <div class="ini-fecha" id="ini-fecha"></div>
+  <div class="ini-grid">
+    <button class="ini-btn" onclick="entrar('cancha')">
+      <div class="ib-ico">⚽</div>
+      <div class="ib-nom">Cancha</div>
+      <div class="ib-sub">Registrar cobros</div>
+    </button>
+    <button class="ini-btn res" onclick="mostrarPin()">
+      <div class="ib-ico">📊</div>
+      <div class="ib-nom">Resumen</div>
+      <div class="ib-sub">Ver resultados</div>
+    </button>
+  </div>
+</div>
+
+<!-- ══ PIN ══ -->
+<div id="s-pin">
+  <div class="pin-tit">🔑 Ingresá el PIN</div>
+  <div class="pin-sub">Para ver el resumen</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
+  </div>
+  <div class="pin-teclado">
+    <button class="pk" onclick="pk('1')">1</button>
+    <button class="pk" onclick="pk('2')">2</button>
+    <button class="pk" onclick="pk('3')">3</button>
+    <button class="pk" onclick="pk('4')">4</button>
+    <button class="pk" onclick="pk('5')">5</button>
+    <button class="pk" onclick="pk('6')">6</button>
+    <button class="pk" onclick="pk('7')">7</button>
+    <button class="pk" onclick="pk('8')">8</button>
+    <button class="pk" onclick="pk('9')">9</button>
+    <button class="pk vk"></button>
+    <button class="pk" onclick="pk('0')">0</button>
+    <button class="pk bk" onclick="pkBorrar()">⌫</button>
+  </div>
+  <div class="pin-msg" id="pin-msg"></div>
+  <button class="pin-volver" onclick="irInicio()">← Volver</button>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="s-app" style="display:none;flex-direction:column;min-height:100vh">
+
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-l">
+      <div class="hdr-tit">⚽ Fútbol 5 <span class="hdr-badge" id="hdr-badge"></span></div>
+      <div class="hdr-fecha" id="hdr-fecha"></div>
+    </div>
+    <div class="hdr-r">
+      <div class="hdr-hora" id="hdr-hora"></div>
+      <button class="hdr-sal" onclick="irInicio()">Salir</button>
+    </div>
+  </div>
+
+  <!-- Sync strip -->
+  <div class="sync-strip" id="sync-strip">
+    <div class="sdot"></div>
+    <span id="sync-txt">Sincronizado ✓</span>
+    <button onclick="sincronizar()" style="margin-left:auto;background:rgba(255,255,255,.15);border:none;border-radius:6px;color:inherit;font-family:var(--fn);font-size:10px;font-weight:800;padding:3px 8px;cursor:pointer">Sync</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs"></div>
+
+  <!-- Vistas -->
+  <div class="contenido" id="contenido">
+
+    <!-- COBRO -->
+    <div class="vista" id="v-cobro">
+      <div class="card">
+        <div class="ctit">💰 Nuevo cobro</div>
+
+        <div class="lbl">¿A qué hora?</div>
+        <div class="ops wrap" id="btns-hora"></div>
+
+        <div class="sec" id="sec-cat">
+          <div class="lbl">¿Llevan pelota?</div>
+          <div class="ops c2">
+            <button class="bo" id="btn-cancha" onclick="selCat('Cancha',this)">
+              <span class="i">⚽</span>Solo cancha
+            </button>
+            <button class="bo" id="btn-cyp" onclick="selCat('CanchaYPelota',this)">
+              <span class="i">⚽🟡</span>Cancha + pelota
+            </button>
+          </div>
+          <div id="prev-precio" style="margin-top:10px;text-align:center;font-size:13px;font-weight:800;color:var(--g2);min-height:16px"></div>
+        </div>
+
+        <div class="sec" id="sec-beb">
+          <div class="lbl" style="color:var(--n1)">¿Bebidas? (opcional)</div>
+          <div style="display:flex;gap:7px;align-items:flex-end;flex-wrap:wrap">
+            <div style="flex:1;min-width:120px">
+              <div class="lbl" style="margin-top:0">Bebida</div>
+              <select id="sel-beb"></select>
+            </div>
+            <div style="width:76px">
+              <div class="lbl" style="margin-top:0">Cant.</div>
+              <input type="number" id="beb-cant" min="1" value="1" inputmode="numeric">
+            </div>
+            <button class="bo sn" onclick="agregarBebida()"
+              style="flex-shrink:0;padding:10px 13px;flex-direction:row;gap:5px;border-radius:10px;height:46px;align-self:flex-end;font-size:13px">
+              ➕ Agregar
+            </button>
+          </div>
+          <div id="carrito" style="display:none" class="carrito">
+            <div class="carrito-tit">🛒 Bebidas seleccionadas</div>
+            <div id="carrito-items"></div>
+          </div>
+          <button class="bo sv" onclick="irAPago()"
+            style="width:100%;margin-top:10px;flex-direction:row;gap:7px;justify-content:center;padding:12px">
+            ➡️ Continuar al pago
+          </button>
+        </div>
+
+        <div class="sec" id="sec-pago">
+          <div class="lbl">¿Cómo pagaron?</div>
+          <div class="ops c3">
+            <button class="bo" id="btn-efe" onclick="selPago('Efectivo',this)">
+              <span class="i">💵</span>Efectivo
+            </button>
+            <button class="bo" id="btn-trf" onclick="selPago('Transferencia',this)">
+              <span class="i">📲</span>Transferencia
+            </button>
+            <button class="bo" id="btn-mix" onclick="selPago('Mixto',this)">
+              <span class="i">⚡</span>Mitad y mitad
+            </button>
+          </div>
+          <div id="sec-mixto" style="display:none;margin-top:10px">
+            <div class="pgrid">
+              <div class="pc efe">
+                <span>💵 Efectivo</span>
+                <input type="number" id="mefe" min="0" inputmode="numeric" placeholder="0" oninput="recalc()">
+              </div>
+              <div class="pc trf">
+                <span>📲 Transf.</span>
+                <input type="number" id="mtrf" min="0" inputmode="numeric" placeholder="0" oninput="recalc()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tbox" id="tbox">
+          <div class="tlbl">TOTAL A COBRAR</div>
+          <div class="tmonto" id="t-monto">$0</div>
+          <div class="tdet" id="t-det"></div>
+          <div class="tdesg" id="t-desg"></div>
+        </div>
+
+        <button class="bguard gv" onclick="guardarCobro()">✅ GUARDAR COBRO</button>
+      </div>
+    </div>
+
+    <!-- STOCK OPERADOR (solo ver) -->
+    <div class="vista" id="v-stock-op">
+      <div class="card">
+        <div class="ctit">🥤 Stock de bebidas</div>
+        <div id="stock-op-lista"></div>
+      </div>
+    </div>
+
+    <!-- RESUMEN DÍA -->
+    <div class="vista" id="v-dia">
+      <div class="fctrl">
+        <span>📅</span>
+        <input type="date" id="fecha-dia" onchange="renderDia()">
+      </div>
+      <div class="kgrid k3">
+        <div class="kpi big" style="grid-column:1/-1">
+          <div class="ki">💰</div><div class="kv" id="d-total">$0</div><div class="kl">Total del día</div>
+        </div>
+        <div class="kpi ka"><div class="ki">💵</div><div class="kv" id="d-efe">$0</div><div class="kl">Efectivo</div></div>
+        <div class="kpi ka"><div class="ki">📲</div><div class="kv" id="d-trf">$0</div><div class="kl">Transferencia</div></div>
+        <div class="kpi"><div class="ki">🎯</div><div class="kv" id="d-n">0</div><div class="kl">Turnos</div></div>
+        <div class="kpi kn"><div class="ki">⚽</div><div class="kv" id="d-cancha">$0</div><div class="kl">Cancha</div></div>
+        <div class="kpi kam"><div class="ki">🟡</div><div class="kv" id="d-pelota">$0</div><div class="kl">Pelota</div></div>
+        <div class="kpi km"><div class="ki">🥤</div><div class="kv" id="d-beb">$0</div><div class="kl">Bebidas</div></div>
+      </div>
+      <div style="font-size:10px;font-weight:900;color:var(--g2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Turnos</div>
+      <div id="lista-dia"></div>
+    </div>
+
+    <!-- RESUMEN MES -->
+    <div class="vista" id="v-mes">
+      <div class="mctrl">
+        <button class="marrow" onclick="cambiarMes(-1)">‹</button>
+        <div class="mxt" id="mes-txt"></div>
+        <button class="marrow" onclick="cambiarMes(1)">›</button>
+      </div>
+      <div class="kgrid k2">
+        <div class="kpi big" style="grid-column:1/-1">
+          <div class="ki">💰</div><div class="kv" id="m-total">$0</div><div class="kl">Total del mes</div>
+        </div>
+        <div class="kpi ka"><div class="ki">💵</div><div class="kv" id="m-efe">$0</div><div class="kl">Efectivo</div></div>
+        <div class="kpi ka"><div class="ki">📲</div><div class="kv" id="m-trf">$0</div><div class="kl">Transferencia</div></div>
+        <div class="kpi"><div class="ki">🎯</div><div class="kv" id="m-n">0</div><div class="kl">Turnos</div></div>
+        <div class="kpi kn"><div class="ki">⚽</div><div class="kv" id="m-cancha">$0</div><div class="kl">Cancha</div></div>
+        <div class="kpi kam"><div class="ki">🟡</div><div class="kv" id="m-pelota">$0</div><div class="kl">Pelota</div></div>
+        <div class="kpi km"><div class="ki">🥤</div><div class="kv" id="m-beb">$0</div><div class="kl">Bebidas</div></div>
+      </div>
+      <div style="font-size:10px;font-weight:900;color:var(--g2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Calendario</div>
+      <div id="cal-mes"></div>
+    </div>
+
+    <!-- STOCK DUEÑO (ver + editar) -->
+    <div class="vista" id="v-stock-du">
+      <div class="card">
+        <div class="ctit">📊 Estado actual</div>
+        <div id="stock-du-lista"></div>
+      </div>
+      <div class="card">
+        <div class="ctit">✏️ Stock inicial</div>
+        <p style="font-size:11px;color:var(--g2);margin-bottom:12px;font-weight:700">
+          Solo la primera vez o después de un recuento físico.
+        </p>
+        <div id="stock-du-edit"></div>
+        <button class="bguard gv" onclick="guardarStockIni()">💾 GUARDAR</button>
+      </div>
+    </div>
+
+    <!-- REPOSICIÓN -->
+    <div class="vista" id="v-repo">
+      <div class="card">
+        <div class="ctit">¿Qué ingresó?</div>
+        <div class="lbl">Bebida</div>
+        <div class="ops wrap" id="btns-repo" style="gap:7px"></div>
+        <div class="lbl" style="margin-top:14px">Cantidad</div>
+        <input type="number" id="repo-cant" min="1" value="1" inputmode="numeric">
+        <div class="lbl" style="margin-top:14px">Costo por unidad (opcional)</div>
+        <input type="number" id="repo-costo" min="0" inputmode="numeric" placeholder="Ej: 800">
+        <button class="bguard gm" onclick="guardarRepo()">📦 REGISTRAR</button>
+      </div>
+      <div class="card">
+        <div class="ctit">📋 Últimas reposiciones</div>
+        <div id="lista-repo"></div>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="vista" id="v-config">
+      <!-- Google Sheets -->
+      <div class="card">
+        <div class="ctit">☁️ Google Sheets</div>
+        <div id="sheets-ok-box" style="display:none;background:var(--v5);border-radius:9px;padding:10px 12px;margin-bottom:10px;align-items:center;gap:8px">
+          <span style="font-size:18px">✅</span>
+          <div>
+            <div style="font-size:13px;font-weight:900;color:var(--v2)">Conectado</div>
+            <div style="font-size:10px;color:var(--g2)" id="sheets-preview"></div>
+          </div>
+        </div>
+        <div id="sheets-form-box">
+          <p style="font-size:12px;font-weight:700;color:var(--g2);margin-bottom:10px;line-height:1.6">
+            Pegá la URL de tu Apps Script para sincronizar con Google Sheets.
+          </p>
+          <div class="lbl">URL del Apps Script</div>
+          <input type="text" id="cfg-url" placeholder="https://script.google.com/macros/s/...">
+          <button class="bguard ga" onclick="guardarURL()" style="margin-top:10px;padding:12px">🔗 CONECTAR</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="bguard gv" onclick="sincronizar()" style="margin-top:0;flex:1;padding:11px;font-size:13px">🔄 Sincronizar</button>
+          <button class="bguard gg" onclick="verPendientes()" style="margin-top:0;flex:1">📋 Pendientes (<span id="n-pend">0</span>)</button>
+        </div>
+      </div>
+
+      <!-- PIN -->
+      <div class="card">
+        <div class="ctit">🔑 PIN del Resumen</div>
+        <p style="font-size:12px;font-weight:700;color:var(--g2);margin-bottom:12px;line-height:1.6">
+          PIN de 4 dígitos. El PIN inicial es <strong>1234</strong> — cambialo.
+        </p>
+        <div class="cfg-grid">
+          <div><div class="lbl">PIN actual</div><input type="password" id="pin-actual" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+          <div><div class="lbl">PIN nuevo</div><input type="password" id="pin-nuevo" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+        </div>
+        <button class="bguard gv" onclick="cambiarPin()" style="margin-top:10px;padding:12px;font-size:14px">🔑 CAMBIAR PIN</button>
+      </div>
+
+      <!-- Precios -->
+      <div class="card">
+        <div class="ctit">💲 Precios</div>
+        <p style="font-size:11px;color:var(--g2);margin-bottom:12px;font-weight:700">
+          Los cobros anteriores conservan el precio que tenían.
+        </p>
+        <div class="cfg-grid">
+          <div><div class="lbl">⚽ Cancha / hora</div><input type="number" id="cfg-cancha" min="0" inputmode="numeric" placeholder="Ej: 5000"></div>
+          <div><div class="lbl">🟡 Pelota / turno</div><input type="number" id="cfg-pelota" min="0" inputmode="numeric" placeholder="Ej: 500"></div>
+        </div>
+        <div id="cfg-beb-precios" style="margin-top:12px"></div>
+        <button class="bguard gv" onclick="guardarConfig()">💾 GUARDAR PRECIOS</button>
+      </div>
+
+      <!-- Historial precios -->
+      <div class="card">
+        <div class="ctit">📋 Historial de precios</div>
+        <div id="hist-precios"></div>
+      </div>
+
+      <!-- Horarios -->
+      <div class="card">
+        <div class="ctit">🕐 Horarios de turno</div>
+        <p style="font-size:11px;color:var(--g2);margin-bottom:10px;font-weight:700">Un horario por línea — formato HH:MM</p>
+        <textarea id="cfg-turnos" rows="6"></textarea>
+        <button class="bguard gv" onclick="guardarTurnos()" style="margin-top:10px">💾 GUARDAR HORARIOS</button>
+      </div>
+
+      <!-- Bebidas -->
+      <div class="card">
+        <div class="ctit">🥤 Bebidas</div>
+        <div id="cfg-bebs"></div>
+        <button class="bguard gv" onclick="guardarBebidas()" style="margin-top:10px;padding:12px;font-size:14px">💾 GUARDAR</button>
+      </div>
+
+      <!-- Guía Sheets -->
+      <div class="card">
+        <div class="ctit">📖 Guía Google Sheets</div>
+        <div class="setup-box">
+          <h3><span class="pnum">1</span>Crear la planilla</h3>
+          <p>Ir a <strong>sheets.google.com</strong> → tocar <strong>"+"</strong> → nombrarla <strong>"Cancha Fútbol 5"</strong>.</p>
+        </div>
+        <div class="setup-box">
+          <h3><span class="pnum">2</span>Abrir Apps Script</h3>
+          <p>En la planilla: menú <strong>Extensiones → Apps Script</strong>.</p>
+        </div>
+        <div class="setup-box">
+          <h3><span class="pnum">3</span>Pegar el código</h3>
+          <p>Borrar todo y pegar este código:</p>
+          <code id="codigo-gs">...</code>
+          <button onclick="copiarCodigo()" style="margin-top:5px;padding:6px 12px;border:none;border-radius:7px;background:#3F51B5;color:#fff;font-family:var(--fn);font-size:11px;font-weight:800;cursor:pointer">📋 Copiar</button>
+        </div>
+        <div class="setup-box">
+          <h3><span class="pnum">4</span>Publicar</h3>
+          <p><strong>Implementar → Nueva implementación → Aplicación web</strong> → Acceso: <strong>Cualquier persona</strong> → Implementar → Autorizar.</p>
+        </div>
+        <div class="setup-box">
+          <h3><span class="pnum">5</span>Pegar la URL</h3>
+          <p>Copiar la URL que aparece y pegarla en el campo de arriba.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .contenido -->
+</div><!-- #s-app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════
+//  STORAGE
+// ════════════════════════════════════════════
+const SS={
+  g:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
+  s:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+};
+
+let cfg         = SS.g('cfg',{cancha:0,pelota:0});
+let bebidas     = SS.g('bebs',['Cerveza','Agua','Gatorade']);
+let precBeb     = SS.g('pbeb',{});
+let stockIni    = SS.g('stk',{});
+let cobros      = SS.g('cobros',[]);
+let pendientes  = SS.g('pend',[]);
+let repos       = SS.g('repos',[]);
+let turnos      = SS.g('turnos',['08:00','09:00','10:00','11:00','12:00','13:00',
+                                  '14:00','15:00','16:00','17:00','18:00','19:00',
+                                  '20:00','21:00','22:00','23:00']);
+let histPrecios = SS.g('hist',[]);
+let sheetURL    = SS.g('sheetURL','');
+let pinSaved    = SS.g('pin','1234');
+
+// ════════════════════════════════════════════
+//  FECHA / HORA
+// ════════════════════════════════════════════
+const HOY = new Date();
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+function isoFecha(d){return d.toISOString().split('T')[0]}
+function fmt$(n){return '$'+Math.round(n||0).toLocaleString('es-AR')}
+function precioEn(f){
+  const h=[...histPrecios].sort((a,b)=>b.desde.localeCompare(a.desde));
+  return h.find(x=>x.desde<=f)||cfg;
+}
+
+// reloj
+function tick(){
+  const t=new Date().toTimeString().slice(0,5);
+  const e=document.getElementById('hdr-hora');
+  if(e)e.textContent=t;
+}
+tick();setInterval(tick,30000);
+
+const hoyStr = isoFecha(HOY);
+const fechaTxt = HOY.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+document.getElementById('ini-fecha').textContent = fechaTxt;
+document.getElementById('fecha-dia').value = hoyStr;
+let mesMes=HOY.getMonth(), mesAnio=HOY.getFullYear();
+
+// ════════════════════════════════════════════
+//  PANTALLAS RAÍZ
+// ════════════════════════════════════════════
+function mostrarSolo(id){
+  ['s-inicio','s-pin','s-app'].forEach(s=>{
+    const el=document.getElementById(s);
+    el.style.display='none';
+  });
+  const target=document.getElementById(id);
+  target.style.display=(id==='s-app')?'flex':'flex';
+  target.style.flexDirection='column';
+}
+
+function irInicio(){
+  mostrarSolo('s-inicio');
+  document.getElementById('s-inicio').style.display='flex';
+  document.getElementById('s-inicio').style.flexDirection='column';
+  resetCobro();
+}
+
+// ════════════════════════════════════════════
+//  PIN
+// ════════════════════════════════════════════
+let pinIngresado='';
+
+function mostrarPin(){
+  pinIngresado='';
+  actualizarDots(false);
+  document.getElementById('pin-msg').textContent='';
+  document.getElementById('s-inicio').style.display='none';
+  const sp=document.getElementById('s-pin');
+  sp.style.display='flex';
+  sp.style.flexDirection='column';
+  sp.style.alignItems='center';
+  sp.style.justifyContent='center';
+}
+
+function pk(n){
+  if(pinIngresado.length>=4)return;
+  pinIngresado+=n;
+  actualizarDots(false);
+  if(pinIngresado.length===4)setTimeout(verificarPin,150);
+}
+
+function pkBorrar(){
+  pinIngresado=pinIngresado.slice(0,-1);
+  actualizarDots(false);
+  document.getElementById('pin-msg').textContent='';
+}
+
+function actualizarDots(error){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd'+i);
+    if(!d)return;
+    d.className='pin-dot'+(error?' err':i<pinIngresado.length?' on':'');
+  }
+}
+
+function verificarPin(){
+  if(pinIngresado===pinSaved){
+    document.getElementById('s-pin').style.display='none';
+    entrar('resumen');
+  } else {
+    actualizarDots(true);
+    document.getElementById('pin-msg').textContent='PIN incorrecto — intentá de nuevo';
+    setTimeout(()=>{pinIngresado='';actualizarDots(false);document.getElementById('pin-msg').textContent=''},1400);
+  }
+}
+
+function cambiarPin(){
+  const actual=document.getElementById('pin-actual').value;
+  const nuevo=document.getElementById('pin-nuevo').value;
+  if(actual!==pinSaved)return toast('⚠️ PIN actual incorrecto','err');
+  if(nuevo.length!==4||!/^\d{4}$/.test(nuevo))return toast('⚠️ El PIN nuevo debe tener exactamente 4 dígitos','err');
+  pinSaved=nuevo;SS.s('pin',pinSaved);
+  document.getElementById('pin-actual').value='';
+  document.getElementById('pin-nuevo').value='';
+  toast('✅ PIN cambiado correctamente');
+}
+
+// ════════════════════════════════════════════
+//  TABS POR MODO
+// ════════════════════════════════════════════
+const TABS = {
+  cancha: [
+    {id:'cobro',    ico:'💰', lbl:'Cobro'},
+    {id:'stock-op', ico:'🥤', lbl:'Stock'},
+  ],
+  resumen: [
+    {id:'dia',      ico:'📅', lbl:'Hoy'},
+    {id:'mes',      ico:'📆', lbl:'Mes'},
+    {id:'stock-du', ico:'🥤', lbl:'Stock'},
+    {id:'repo',     ico:'📦', lbl:'Reposición'},
+    {id:'config',   ico:'⚙️', lbl:'Config'},
+  ]
+};
+
+let modoActual = null;
+let vistaActual = null;
+
+function entrar(modo){
+  modoActual = modo;
+
+  // header
+  document.getElementById('hdr-badge').textContent = modo==='cancha'?'⚽ Cancha':'📊 Resumen';
+  document.getElementById('hdr-fecha').textContent = fechaTxt;
+
+  // sync strip solo en resumen
+  document.getElementById('sync-strip').style.display = modo==='resumen'?'flex':'none';
+
+  // construir tabs
+  const tabsDef = TABS[modo];
+  const tabsCont = document.getElementById('tabs');
+  tabsCont.innerHTML = tabsDef.map((t,i)=>
+    `<button class="tab${i===0?' activa':''}" data-vista="${t.id}" onclick="cambiarVista('${t.id}')">
+       <span class="ti">${t.ico}</span>${t.lbl}
+     </button>`
+  ).join('');
+
+  // mostrar app
+  document.getElementById('s-inicio').style.display='none';
+  document.getElementById('s-pin').style.display='none';
+  const app=document.getElementById('s-app');
+  app.style.display='flex';
+  app.style.flexDirection='column';
+
+  // activar primera vista
+  cambiarVista(tabsDef[0].id, true);
+
+  // init según modo
+  if(modo==='cancha'){
+    renderBtnsHora();
+    renderSelBebidas();
+  } else {
+    updateSyncUI();
+    if(navigator.onLine&&pendientes.length>0&&sheetURL)sincronizar();
+  }
+}
+
+function cambiarVista(id, sinScroll){
+  // ocultar todas las vistas
+  document.querySelectorAll('.vista').forEach(v=>v.classList.remove('activa'));
+  // mostrar la pedida
+  const target = document.getElementById('v-'+id);
+  if(target) target.classList.add('activa');
+  vistaActual = id;
+
+  // marcar tab activa
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.toggle('activa', t.dataset.vista===id);
+  });
+
+  // cargar datos de la vista
+  if(id==='dia')        renderDia();
+  if(id==='mes')        renderMes();
+  if(id==='stock-op')   renderStockOp();
+  if(id==='stock-du')   renderStockDu();
+  if(id==='repo')       { renderRepo(); renderBtnsRepo(); }
+  if(id==='config')     renderConfig();
+
+  if(!sinScroll) document.getElementById('contenido').scrollTop=0;
+}
+
+// ════════════════════════════════════════════
+//  SYNC
+// ════════════════════════════════════════════
+function updateSyncUI(){
+  const n=pendientes.length, online=navigator.onLine;
+  const strip=document.getElementById('sync-strip');
+  const txt=document.getElementById('sync-txt');
+  const npend=document.getElementById('n-pend');
+  if(npend)npend.textContent=n;
+  if(!strip)return;
+  strip.className='sync-strip'+(online?(n>0?' pend':''):'noinet');
+  strip.style.display = modoActual==='resumen'?'flex':'none';
+  txt.textContent = !online?'Sin internet — guardado local':n>0?`${n} cobro${n>1?'s':''} por sincronizar`:'Sincronizado ✓';
+}
+window.addEventListener('online',()=>{updateSyncUI();if(pendientes.length&&sheetURL)sincronizar()});
+window.addEventListener('offline',updateSyncUI);
+
+async function enviarASheets(d){
+  if(!sheetURL)return false;
+  try{await fetch(sheetURL,{method:'POST',body:JSON.stringify(d),headers:{'Content-Type':'application/json'},mode:'no-cors'});return true}
+  catch{return false}
+}
+
+async function sincronizar(){
+  if(!sheetURL)return toast('⚠️ Configurá la URL en Config','err');
+  if(!navigator.onLine)return toast('⚠️ Sin internet','err');
+  if(!pendientes.length){toast('✅ Todo sincronizado');return}
+  toast('🔄 Sincronizando...');
+  const lista=[...pendientes];let ok=0;
+  for(const item of lista){
+    if(await enviarASheets(item)){
+      // Solo agregar a cobros si no existe ya
+      if(!cobros.find(c=>c.id===item.id)) cobros.push(item);
+      pendientes=pendientes.filter(p=>p.id!==item.id);
+      ok++;
+    }
+  }
+  SS.s('cobros',cobros);SS.s('pend',pendientes);
+  updateSyncUI();
+  if(ok>0){toast(`✅ ${ok} cobro${ok>1?'s':''} sincronizado${ok>1?'s':''}`);renderDia();renderMes()}
+  else toast('⚠️ No se pudo sincronizar','err');
+}
+
+function verPendientes(){
+  if(!pendientes.length){toast('✅ No hay pendientes');return}
+  alert('📋 Pendientes:\n\n'+pendientes.map(p=>`• ${p.fecha} ${p.hora}hs — ${fmt$(p.total)}`).join('\n')+'\n\nUsá "Sincronizar" cuando tengas internet.');
+}
+
+async function guardarSync(c){
+  if(!sheetURL||!navigator.onLine){
+    // Sin conexión o sin URL: guardar solo en pendientes
+    pendientes.push(c);SS.s('pend',pendientes);
+    updateSyncUI();
+    toast(navigator.onLine?'💾 Guardado localmente':'💾 Sin internet — guardado local');
+  } else {
+    // Con conexión: intentar sincronizar
+    const ok=await enviarASheets(c);
+    if(ok){
+      // Sincronizado: guardar en cobros definitivos
+      cobros.push(c);SS.s('cobros',cobros);
+      toast('✅ Cobro guardado y sincronizado');
+    } else {
+      // Falló: guardar en pendientes para reintentar
+      pendientes.push(c);SS.s('pend',pendientes);
+      toast('💾 Guardado — se sincronizará cuando haya conexión');
+    }
+    updateSyncUI();
+  }
+}
+
+// ════════════════════════════════════════════
+//  COBRO
+// ════════════════════════════════════════════
+let horaSel=null, catSel=null, pagoSel=null, carritoItems=[];
+
+function renderBtnsHora(){
+  const c=document.getElementById('btns-hora');
+  if(!c)return;
+  c.innerHTML='';
+  turnos.forEach(h=>{
+    const b=document.createElement('button');
+    b.className='bo hb';b.style.minWidth='64px';
+    b.innerHTML=`<span class="i">🕐</span>${h}`;
+    b.onclick=()=>{
+      c.querySelectorAll('.bo').forEach(x=>x.className='bo hb');
+      b.classList.add('sv');
+      horaSel=h;
+      catSel=null;pagoSel=null;carritoItems=[];
+      ocultarSecs();
+      document.getElementById('prev-precio').textContent='';
+      document.getElementById('tbox').style.display='none';
+      renderCarrito();
+      document.getElementById('sec-cat').classList.add('on');
+    };
+    c.appendChild(b);
+  });
+}
+
+function ocultarSecs(){
+  ['sec-cat','sec-beb','sec-pago'].forEach(id=>{
+    document.getElementById(id).classList.remove('on');
+  });
+  document.getElementById('btn-cancha').className='bo';
+  document.getElementById('btn-cyp').className='bo';
+  document.getElementById('btn-efe').className='bo';
+  document.getElementById('btn-trf').className='bo';
+  document.getElementById('btn-mix').className='bo';
+  document.getElementById('sec-mixto').style.display='none';
+}
+
+function renderSelBebidas(){
+  const sel=document.getElementById('sel-beb');
+  if(!sel)return;
+  sel.innerHTML=bebidas.map(b=>`<option value="${b}">${b}${precBeb[b]?' — '+fmt$(precBeb[b]):''}</option>`).join('');
+}
+
+function selCat(cat,btn){
+  catSel=cat;
+  document.getElementById('btn-cancha').className='bo';
+  document.getElementById('btn-cyp').className='bo';
+  btn.classList.add('sv');
+  const p=precioEn(hoyStr);
+  const pc=p.cancha||0, pp=p.pelota||0;
+  document.getElementById('prev-precio').textContent=
+    cat==='Cancha'?`⚽ 1h = ${fmt$(pc)}`:`⚽ ${fmt$(pc)} + 🟡 ${fmt$(pp)} = ${fmt$(pc+pp)}`;
+  carritoItems=[];pagoSel=null;
+  renderCarrito();renderSelBebidas();
+  document.getElementById('beb-cant').value='1';
+  document.getElementById('sec-beb').classList.add('on');
+  document.getElementById('sec-pago').classList.remove('on');
+  document.getElementById('tbox').style.display='none';
+  document.getElementById('btn-efe').className='bo';
+  document.getElementById('btn-trf').className='bo';
+  document.getElementById('btn-mix').className='bo';
+}
+
+function agregarBebida(){
+  const sel=document.getElementById('sel-beb');
+  const beb=sel.value;
+  if(!beb)return toast('⚠️ Elegí una bebida','err');
+  const cant=parseInt(document.getElementById('beb-cant').value)||1;
+  const precio=precBeb[beb]||0;
+  const existe=carritoItems.find(i=>i.beb===beb);
+  if(existe){existe.cant+=cant;existe.sub=existe.cant*existe.precio}
+  else carritoItems.push({beb,cant,precio,sub:cant*precio});
+  renderCarrito();
+  document.getElementById('beb-cant').value='1';
+  toast(`🥤 ${beb} x${cant} agregada`);
+}
+
+function quitarBebida(beb){
+  carritoItems=carritoItems.filter(i=>i.beb!==beb);
+  renderCarrito();recalc();
+}
+
+function renderCarrito(){
+  const cont=document.getElementById('carrito');
+  const items=document.getElementById('carrito-items');
+  if(!cont||!items)return;
+  if(!carritoItems.length){cont.style.display='none';return}
+  cont.style.display='block';
+  items.innerHTML=carritoItems.map(i=>
+    `<div class="ci">
+       <div class="ci-nom">🥤 ${i.beb} × ${i.cant}</div>
+       <div class="ci-der">
+         <div class="ci-mon">${fmt$(i.sub)}</div>
+         <button class="ci-q" onclick="quitarBebida('${i.beb}')">✕</button>
+       </div>
+     </div>`
+  ).join('');
+}
+
+function irAPago(){
+  pagoSel=null;
+  document.getElementById('sec-pago').classList.add('on');
+  document.getElementById('btn-efe').className='bo';
+  document.getElementById('btn-trf').className='bo';
+  document.getElementById('btn-mix').className='bo';
+  document.getElementById('sec-mixto').style.display='none';
+  document.getElementById('mefe').value='';
+  document.getElementById('mtrf').value='';
+  document.getElementById('tbox').style.display='none';
+}
+
+function selPago(pago,btn){
+  pagoSel=pago;
+  document.getElementById('btn-efe').className='bo';
+  document.getElementById('btn-trf').className='bo';
+  document.getElementById('btn-mix').className='bo';
+  btn.classList.add('sa');
+  document.getElementById('sec-mixto').style.display=pago==='Mixto'?'block':'none';
+  if(pago!=='Mixto'){
+    document.getElementById('mefe').value='';
+    document.getElementById('mtrf').value='';
+  }
+  recalc();
+}
+
+function calcMontos(){
+  if(!catSel||!horaSel)return{total:0,efe:0,trf:0,pC:0,pP:0,pB:0};
+  const p=precioEn(hoyStr);
+  const pC=p.cancha||0, pP=catSel==='CanchaYPelota'?(p.pelota||0):0;
+  const pB=carritoItems.reduce((s,i)=>s+i.sub,0);
+  const base=pC+pP+pB;
+  let efe=0,trf=0,total=0;
+  if(pagoSel==='Mixto'){
+    efe=parseFloat(document.getElementById('mefe').value)||0;
+    trf=parseFloat(document.getElementById('mtrf').value)||0;
+    total=efe+trf;
+  } else {
+    total=base;
+    if(pagoSel==='Efectivo')efe=total;
+    if(pagoSel==='Transferencia')trf=total;
+  }
+  return{total,efe,trf,pC,pP,pB};
+}
+
+function recalc(){
+  const{total,efe,trf}=calcMontos();
+  const box=document.getElementById('tbox');
+  if(!pagoSel||total===0){box.style.display='none';return}
+  box.style.display='block';
+  document.getElementById('t-monto').textContent=fmt$(total);
+  let det=catSel==='Cancha'?'⚽ Cancha 1h':'⚽🟡 Cancha + pelota 1h';
+  if(carritoItems.length)det+=' · 🥤 '+carritoItems.map(i=>`${i.beb} x${i.cant}`).join(', ');
+  document.getElementById('t-det').textContent=det;
+  let des='';
+  if(pagoSel==='Efectivo')des='💵 Todo en efectivo';
+  if(pagoSel==='Transferencia')des='📲 Todo por transferencia';
+  if(pagoSel==='Mixto')des=`⚡ ${fmt$(efe)} efectivo + ${fmt$(trf)} transf.`;
+  document.getElementById('t-desg').textContent=des;
+}
+
+async function guardarCobro(){
+  if(!horaSel)return toast('⚠️ Elegí el horario','err');
+  if(!catSel)return toast('⚠️ Elegí cancha o cancha + pelota','err');
+  if(!pagoSel)return toast('⚠️ Elegí cómo pagaron','err');
+  const{total,efe,trf,pC,pP,pB}=calcMontos();
+  if(pagoSel==='Mixto'&&total===0)return toast('⚠️ Ingresá los montos','err');
+  if(total===0)return toast('⚠️ Configurá precios en Config (desde Resumen → ⚙️)','err');
+  const cobro={
+    id:Date.now(),fecha:hoyStr,hora:horaSel,cat:catSel,
+    bebidas:carritoItems.map(i=>({beb:i.beb,cant:i.cant,sub:i.sub})),
+    total,efe,trf,medio:pagoSel,pC,pP,pB
+  };
+  await guardarSync(cobro);
+  resetCobro();
+}
+
+function resetCobro(){
+  horaSel=null;catSel=null;pagoSel=null;carritoItems=[];
+  document.querySelectorAll('#v-cobro .bo').forEach(b=>{
+    b.className=b.classList.contains('hb')?'bo hb':'bo';
+  });
+  ocultarSecs();
+  document.getElementById('tbox').style.display='none';
+  document.getElementById('prev-precio').textContent='';
+  document.getElementById('mefe').value='';
+  document.getElementById('mtrf').value='';
+  document.getElementById('beb-cant').value='1';
+  renderCarrito();
+}
+
+// ════════════════════════════════════════════
+//  COBROS (todos)
+// ════════════════════════════════════════════
+function todos(){return[...cobros,...pendientes]}
+
+// ════════════════════════════════════════════
+//  RESUMEN DÍA
+// ════════════════════════════════════════════
+function renderDia(){
+  const fecha=document.getElementById('fecha-dia').value;
+  const dia=todos().filter(c=>c.fecha===fecha);
+  const sum=fn=>dia.reduce((s,c)=>s+(fn(c)||0),0);
+  document.getElementById('d-total').textContent=fmt$(sum(c=>c.total));
+  document.getElementById('d-efe').textContent=fmt$(sum(c=>c.efe));
+  document.getElementById('d-trf').textContent=fmt$(sum(c=>c.trf));
+  document.getElementById('d-n').textContent=dia.length;
+  document.getElementById('d-cancha').textContent=fmt$(sum(c=>c.pC));
+  document.getElementById('d-pelota').textContent=fmt$(sum(c=>c.pP));
+  document.getElementById('d-beb').textContent=fmt$(sum(c=>c.pB));
+  const cont=document.getElementById('lista-dia');
+  if(!dia.length){cont.innerHTML=`<div class="vacio"><div class="vi">📭</div><p>Sin cobros ese día</p></div>`;return}
+  const catLbl={Cancha:'⚽ Cancha',CanchaYPelota:'⚽🟡 Cancha + pelota'};
+  const medIco={Efectivo:'💵',Transferencia:'📲',Mixto:'⚡'};
+  const esPend=c=>pendientes.some(p=>p.id===c.id);
+  cont.innerHTML=[...dia].sort((a,b)=>a.hora.localeCompare(b.hora)).map(c=>{
+    const bebs=c.bebidas?.length?' · 🥤 '+c.bebidas.map(b=>`${b.beb} x${b.cant}`).join(', '):'';
+    const pd=esPend(c)?'<span class="pdot"></span>':'';
+    return`<div class="ti ${c.cat==='CanchaYPelota'?'tcp':'tc'}">
+      <div class="ti-l">
+        <div class="cat">${catLbl[c.cat]||c.cat}</div>
+        <div class="det">${c.hora}hs${bebs}</div>
+        <div class="sub">${medIco[c.medio]||''} ${c.medio}${c.medio==='Mixto'?' ('+fmt$(c.efe)+' + '+fmt$(c.trf)+')':''}</div>
+      </div>
+      <div class="ti-r">${pd}<div class="monto">${fmt$(c.total)}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════
+//  RESUMEN MES
+// ════════════════════════════════════════════
+function cambiarMes(d){
+  mesMes+=d;
+  if(mesMes>11){mesMes=0;mesAnio++}
+  if(mesMes<0){mesMes=11;mesAnio--}
+  renderMes();
+}
+
+function renderMes(){
+  document.getElementById('mes-txt').textContent=MESES[mesMes]+' '+mesAnio;
+  const mes=todos().filter(c=>{
+    const d=new Date(c.fecha+'T12:00');
+    return d.getMonth()===mesMes&&d.getFullYear()===mesAnio;
+  });
+  const sum=fn=>mes.reduce((s,c)=>s+(fn(c)||0),0);
+  document.getElementById('m-total').textContent=fmt$(sum(c=>c.total));
+  document.getElementById('m-efe').textContent=fmt$(sum(c=>c.efe));
+  document.getElementById('m-trf').textContent=fmt$(sum(c=>c.trf));
+  document.getElementById('m-n').textContent=mes.length;
+  document.getElementById('m-cancha').textContent=fmt$(sum(c=>c.pC));
+  document.getElementById('m-pelota').textContent=fmt$(sum(c=>c.pP));
+  document.getElementById('m-beb').textContent=fmt$(sum(c=>c.pB));
+
+  const porF={};mes.forEach(c=>{if(!porF[c.fecha])porF[c.fecha]=0;porF[c.fecha]+=c.total});
+  const primero=new Date(mesAnio,mesMes,1),ultimo=new Date(mesAnio,mesMes+1,0);
+  let cur=new Date(primero);
+  let dow=cur.getDay();if(dow===0)dow=7;cur.setDate(cur.getDate()-(dow-1));
+  const DIAS=['Lu','Ma','Mi','Ju','Vi','Sá','Do'];
+  let html='',primera=true;
+  while(cur<=ultimo){
+    html+='<div class="sem-blk">';
+    if(primera){
+      html+='<div class="sem-dias" style="margin-bottom:4px">'+DIAS.map(d=>`<div style="text-align:center;font-size:9px;font-weight:900;color:var(--g2)">${d}</div>`).join('')+'</div>';
+      primera=false;
+    }
+    const sf=new Date(cur.getTime()+6*86400000);
+    const mi=cur.getMonth(),mf=sf.getMonth();
+    const tit=mi===mf?`${cur.getDate()} al ${sf.getDate()} de ${MESES[mi]}`:`${cur.getDate()} ${MESES[mi].slice(0,3)} — ${sf.getDate()} ${MESES[mf].slice(0,3)}`;
+    html+=`<div class="sem-tit">${tit}</div><div class="sem-dias">`;
+    for(let i=0;i<7;i++){
+      const f=isoFecha(cur);
+      const enM=cur.getMonth()===mesMes;
+      const esH=f===hoyStr;
+      const m=porF[f]||0;
+      const cls=esH?'sd hd':m>0?'sd tiene':i>=5?'sd fds':'sd';
+      html+=`<div class="${cls}" style="${!enM?'opacity:.22':''}"><div class="sdn">${cur.getDate()}</div><div class="sdm">${m?fmt$(m):''}</div></div>`;
+      cur.setDate(cur.getDate()+1);
+    }
+    html+='</div></div>';
+  }
+  document.getElementById('cal-mes').innerHTML=html;
+}
+
+// ════════════════════════════════════════════
+//  STOCK
+// ════════════════════════════════════════════
+function getStock(){
+  const a={};bebidas.forEach(b=>{a[b]=stockIni[b]||0});
+  repos.forEach(r=>{if(a[r.prod]!==undefined)a[r.prod]+=r.cant});
+  todos().forEach(c=>{
+    (c.bebidas||[]).forEach(b=>{if(a[b.beb]!==undefined)a[b.beb]-=b.cant});
+  });
+  return a;
+}
+
+function renderStockLista(contId){
+  const a=getStock();
+  const cont=document.getElementById(contId);
+  if(!cont)return;
+  if(!bebidas.length){cont.innerHTML=`<div class="vacio"><div class="vi">🥤</div><p>Sin bebidas configuradas</p></div>`;return}
+  cont.innerHTML=bebidas.map(b=>{
+    const n=a[b];
+    const cls=n<=0?'sin':n<=5?'rev':'ok';
+    const estado=n<=0?'🔴 SIN STOCK':n<=5?'🟡 Quedan pocos':'🟢 OK';
+    return`<div class="sti ${cls}">
+      <div><div class="sp">${b}</div><div class="se">${estado}</div></div>
+      <div class="sc">${Math.max(0,n)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderStockOp(){
+  renderStockLista('stock-op-lista');
+}
+
+function renderStockDu(){
+  renderStockLista('stock-du-lista');
+  const edit=document.getElementById('stock-du-edit');
+  if(!edit)return;
+  edit.innerHTML=bebidas.map(b=>`
+    <div class="lbl">${b} — stock inicial</div>
+    <input type="number" id="si-${b.replace(/\W/g,'_')}" min="0" inputmode="numeric" value="${stockIni[b]||0}">
+    <div style="height:8px"></div>`).join('');
+}
+
+function guardarStockIni(){
+  bebidas.forEach(b=>{
+    const el=document.getElementById('si-'+b.replace(/\W/g,'_'));
+    if(el)stockIni[b]=parseInt(el.value)||0;
+  });
+  SS.s('stk',stockIni);
+  renderStockDu();
+  renderStockOp();
+  toast('💾 Stock guardado');
+}
+
+// ════════════════════════════════════════════
+//  REPOSICIÓN
+// ════════════════════════════════════════════
+let repoBeb=null;
+
+function renderBtnsRepo(){
+  const c=document.getElementById('btns-repo');if(!c)return;
+  c.innerHTML='';repoBeb=null;
+  bebidas.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className='bo';btn.style.minWidth='80px';
+    btn.innerHTML=`<span class="i">🥤</span>${b}`;
+    btn.onclick=()=>{
+      c.querySelectorAll('.bo').forEach(x=>x.className='bo');
+      btn.classList.add('sn');
+      repoBeb=b;
+    };
+    c.appendChild(btn);
+  });
+}
+
+function guardarRepo(){
+  if(!repoBeb)return toast('⚠️ Elegí la bebida','err');
+  const cant=parseInt(document.getElementById('repo-cant').value)||0;
+  const costo=parseFloat(document.getElementById('repo-costo').value)||0;
+  if(cant<=0)return toast('⚠️ Ingresá la cantidad','err');
+  repos.push({id:Date.now(),fecha:hoyStr,prod:repoBeb,cant,costo});
+  SS.s('repos',repos);
+  toast('📦 Reposición guardada');
+  renderRepo();renderBtnsRepo();
+  document.getElementById('repo-cant').value='1';
+  document.getElementById('repo-costo').value='';
+}
+
+function renderRepo(){
+  const c=document.getElementById('lista-repo');if(!c)return;
+  if(!repos.length){c.innerHTML=`<div class="vacio"><div class="vi">📭</div><p>Sin reposiciones</p></div>`;return}
+  c.innerHTML=[...repos].slice(-10).reverse().map(r=>
+    `<div class="ti" style="border-left-color:var(--m1)">
+       <div class="ti-l">
+         <div class="cat">📦 Reposición</div>
+         <div class="det">${r.prod} — ${r.cant} unidades${r.costo?' · '+fmt$(r.costo)+'/u':''}</div>
+         <div class="sub">📅 ${new Date(r.fecha+'T12:00').toLocaleDateString('es-AR')}</div>
+       </div>
+       <div class="ti-r"><div class="monto" style="color:var(--m1)">${r.costo?fmt$(r.cant*r.costo):'—'}</div></div>
+     </div>`
+  ).join('');
+}
+
+// ════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════
+const GS_CODE=`function doPost(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var data = JSON.parse(e.postData.contents);
+    if (data.tipo === 'repo') {
+      var sr = ss.getSheetByName('Reposiciones') || ss.insertSheet('Reposiciones');
+      if (sr.getLastRow()===0) sr.appendRow(['ID','Fecha','Producto','Cantidad','Costo u.','Total']);
+      sr.appendRow([data.id,data.fecha,data.prod,data.cant,data.costo,data.cant*data.costo]);
+    } else {
+      var s = ss.getSheetByName('Ingresos') || ss.insertSheet('Ingresos');
+      if (s.getLastRow()===0) s.appendRow(['ID','Fecha','Hora','Categoría','Bebidas',
+        'Total','Efectivo','Transferencia','Medio','P.Cancha','P.Pelota','P.Bebidas']);
+      var bebs=(data.bebidas||[]).map(function(b){return b.beb+' x'+b.cant}).join(' / ');
+      s.appendRow([data.id,data.fecha,data.hora,data.cat,bebs,
+        data.total,data.efe,data.trf,data.medio,data.pC,data.pP,data.pB]);
+    }
+    return ContentService.createTextOutput(JSON.stringify({ok:true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ok:false,error:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+function renderConfig(){
+  document.getElementById('cfg-cancha').value=cfg.cancha||'';
+  document.getElementById('cfg-pelota').value=cfg.pelota||'';
+  document.getElementById('cfg-turnos').value=turnos.join('\n');
+  document.getElementById('cfg-url').value=sheetURL||'';
+  if(sheetURL){
+    document.getElementById('sheets-ok-box').style.display='flex';
+    document.getElementById('sheets-form-box').style.display='none';
+    document.getElementById('sheets-preview').textContent=sheetURL.slice(0,50)+'...';
+  } else {
+    document.getElementById('sheets-ok-box').style.display='none';
+    document.getElementById('sheets-form-box').style.display='block';
+  }
+  document.getElementById('cfg-beb-precios').innerHTML=bebidas.map(b=>
+    `<div class="lbl">🥤 ${b} — precio venta</div>
+     <input type="number" id="cp-${b.replace(/\W/g,'_')}" min="0" inputmode="numeric" value="${precBeb[b]||''}" placeholder="Ej: 1500">
+     <div style="height:8px"></div>`
+  ).join('');
+  document.getElementById('cfg-bebs').innerHTML=bebidas.map((b,i)=>
+    `<div class="lbl">Bebida ${i+1}</div>
+     <input type="text" id="bn-${i}" value="${b}">
+     <div style="height:6px"></div>`
+  ).join('');
+  document.getElementById('codigo-gs').textContent=GS_CODE;
+  renderHistPrecios();
+  updateSyncUI();
+}
+
+function guardarURL(){
+  const url=document.getElementById('cfg-url').value.trim();
+  if(!url||!url.startsWith('https://script.google.com'))return toast('⚠️ URL inválida','err');
+  sheetURL=url;SS.s('sheetURL',sheetURL);
+  document.getElementById('sheets-ok-box').style.display='flex';
+  document.getElementById('sheets-form-box').style.display='none';
+  document.getElementById('sheets-preview').textContent=url.slice(0,50)+'...';
+  toast('✅ URL guardada');sincronizar();
+}
+
+function copiarCodigo(){
+  navigator.clipboard.writeText(GS_CODE)
+    .then(()=>toast('📋 Código copiado'))
+    .catch(()=>toast('⚠️ Seleccioná el código manualmente','err'));
+}
+
+function guardarConfig(){
+  const nc=parseFloat(document.getElementById('cfg-cancha').value)||0;
+  const np=parseFloat(document.getElementById('cfg-pelota').value)||0;
+  if(nc!==cfg.cancha||np!==cfg.pelota){
+    histPrecios.push({desde:hoyStr,cancha:nc,pelota:np});
+    SS.s('hist',histPrecios);
+  }
+  cfg={cancha:nc,pelota:np};SS.s('cfg',cfg);
+  bebidas.forEach(b=>{
+    const el=document.getElementById('cp-'+b.replace(/\W/g,'_'));
+    if(el)precBeb[b]=parseFloat(el.value)||0;
+  });
+  SS.s('pbeb',precBeb);
+  toast('✅ Precios guardados');
+  renderHistPrecios();
+}
+
+function renderHistPrecios(){
+  const c=document.getElementById('hist-precios');if(!c)return;
+  if(!histPrecios.length){c.innerHTML=`<p style="font-size:11px;color:var(--g2);font-weight:700">Se registra automáticamente al cambiar precios.</p>`;return}
+  c.innerHTML=[...histPrecios].reverse().map(h=>
+    `<div class="ph-item">
+       <div class="phm">📅 Desde ${new Date(h.desde+'T12:00').toLocaleDateString('es-AR')}</div>
+       <div class="phv">⚽ ${fmt$(h.cancha)} · 🟡 ${fmt$(h.pelota)}</div>
+     </div>`
+  ).join('');
+}
+
+function guardarTurnos(){
+  const raw=document.getElementById('cfg-turnos').value;
+  const arr=raw.split('\n').map(l=>l.trim()).filter(l=>/^\d{1,2}:\d{2}$/.test(l));
+  if(!arr.length)return toast('⚠️ Formato incorrecto. Usá HH:MM (ej: 19:00)','err');
+  turnos=arr;SS.s('turnos',turnos);
+  renderBtnsHora();
+  toast('✅ Horarios guardados');
+}
+
+function guardarBebidas(){
+  const n=bebidas.map((_,i)=>{const e=document.getElementById('bn-'+i);return e?e.value.trim():''}).filter(Boolean);
+  if(!n.length)return toast('⚠️ Necesitás al menos una bebida','err');
+  bebidas=n;SS.s('bebs',bebidas);
+  toast('✅ Bebidas guardadas');
+  renderConfig();
+}
+
+// ════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════
+function toast(msg,tipo){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=tipo==='err'?'#B71C1C':'#2E7D32';
+  t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),3000);
+}
+
+// ══ INIT ══
+// Mostrar pantalla inicio
+document.getElementById('s-inicio').style.display='flex';
+document.getElementById('s-inicio').style.flexDirection='column';
+document.getElementById('s-inicio').style.alignItems='center';
+document.getElementById('s-inicio').style.justifyContent='center';
+</script>
+</body>
+</html>
